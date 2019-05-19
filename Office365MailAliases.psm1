@@ -14,7 +14,7 @@
 
 .NOTES
   Author: Jean-Paul van Ravensberg, Cloudenius.com
-   
+
 .EXAMPLE
   Select-MailAlias -DomainName Google.com -Verbose
 
@@ -49,7 +49,7 @@ Function New-MailAlias {
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
         Connect-EXOPSSession
     }
-    
+
     Write-Verbose "Creating $NumberOfAliases aliases"
 
     Foreach ($i in 1..$NumberOfAliases) {
@@ -78,7 +78,7 @@ Function New-MailAlias {
 
         # Add the owner to the Distribution Group
         Add-DistributionGroupMember -Identity $GroupName -Member $Owner
-        
+
         Write-Verbose "Created group called $GroupName with owner $Owner"
     }
 }
@@ -143,7 +143,7 @@ Function Select-MailAlias {
     return New-Object PSObject -Property ([ordered]@{"Name" = $DistributionGroup.Name; "DisplayName" = $DisplayName; "E-mail" = $DistributionGroup.PrimarySmtpAddress})
 }
 
-Function Get-UsedMailAliases {
+Function Get-UsedMailAlias {
     param(
         [parameter(Mandatory = $false, HelpMessage = "Name prefix that is used to identify the Mail Aliases")]
         [ValidateNotNullOrEmpty()]
@@ -154,11 +154,11 @@ Function Get-UsedMailAliases {
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
         Connect-EXOPSSession
     }
-    
+
     # Check if domain name already exists in Distribution Group
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
         {$_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -notlike "*_CLAIMABLE"}
-    
+
     # Return the new name of the alias(es)
     If ($ExistingDistributionGroup) {
         return $ExistingDistributionGroup | Select-Object Name, DisplayName, PrimarySmtpAddress
@@ -168,7 +168,7 @@ Function Get-UsedMailAliases {
     }
 }
 
-Function Get-UnusedMailAliases {
+Function Get-UnusedMailAlias {
     param(
         [parameter(Mandatory = $false, HelpMessage = "Name prefix that is used to identify the Mail Aliases")]
         [ValidateNotNullOrEmpty()]
@@ -179,11 +179,11 @@ Function Get-UnusedMailAliases {
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
         Connect-EXOPSSession
     }
-    
+
     # Check if domain name already exists in Distribution Group
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
         {$_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -like "*_CLAIMABLE"}
-    
+
     # Return the names of the unused alias(es)
     If ($ExistingDistributionGroup) {
         return $ExistingDistributionGroup | Select-Object Name, DisplayName, PrimarySmtpAddress

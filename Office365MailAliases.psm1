@@ -16,14 +16,15 @@
   Author: Jean-Paul van Ravensberg, Cloudenius.com
 
 .EXAMPLE
-  Select-MailAlias -DomainName Google.com -Verbose
+  Select-MailAlias -DomainName Google.com -ExportAliasesToMailDraft -Verbose
 
-  Create a mail alias for Google.com and provide Verbose output
+  Create a mail alias for Google.com and provide Verbose output. After selecting the mail alias,
+  create a draft mail in the mailbox of the user that contains all the used mail aliases.
 
 .EXAMPLE
   New-MailAlias -NumberOfAliases 9 -Verbose
 
-  Warm up aliases for later use and provide Verbose output
+  Warm up aliases for later use and provide Verbose output.
 #>
 
 Function New-MailAlias {
@@ -87,7 +88,10 @@ Function Select-MailAlias {
     param(
         [parameter(Mandatory = $true, HelpMessage = "Specify the domain name of the website")]
         [ValidateNotNullOrEmpty()]
-        [string]$DomainName
+        [string]$DomainName,
+
+        [parameter(Mandatory = $true, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
+        [switch]$ExportAliasesToMailDraft
     )
 
     ## Login to Office 365
@@ -139,6 +143,11 @@ Function Select-MailAlias {
         Set-DistributionGroup -Identity $DistributionGroup.Name -DisplayName $DisplayName
     }
 
+    # Create the draft mail in the mailbox of the user that contains all the used mail aliases
+    If ($ExportAliasesToMailDraft) {
+        New-MailMessage -Body (Get-UsedMailAlias | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+    }
+
     # Return the new name of the alias
     return New-Object PSObject -Property ([ordered]@{"Name" = $DistributionGroup.Name; "DisplayName" = $DisplayName; "E-mail" = $DistributionGroup.PrimarySmtpAddress})
 }
@@ -147,7 +156,10 @@ Function Get-UsedMailAlias {
     param(
         [parameter(Mandatory = $false, HelpMessage = "Name prefix that is used to identify the Mail Aliases")]
         [ValidateNotNullOrEmpty()]
-        [string]$GroupNamePrefix
+        [string]$GroupNamePrefix,
+
+        [parameter(Mandatory = $true, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
+        [switch]$ExportAliasesToMailDraft
     )
 
     ## Login to Office 365
@@ -159,8 +171,13 @@ Function Get-UsedMailAlias {
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
         {$_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -notlike "*_CLAIMABLE"}
 
+    # Create the draft mail in the mailbox of the user that contains all the used mail aliases
+    If ($ExistingDistributionGroup -and $ExportAliasesToMailDraft) {
+        New-MailMessage -Body ($ExistingDistributionGroup | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+    }
+
     # Return the new name of the alias(es)
-    If ($ExistingDistributionGroup) {
+    If ($ExistingDistributionGroup) {       
         return $ExistingDistributionGroup | Select-Object Name, DisplayName, PrimarySmtpAddress
     }
     Else {

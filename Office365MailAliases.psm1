@@ -177,7 +177,7 @@ Function Get-UsedMailAlias {
     }
 
     # Return the new name of the alias(es)
-    If ($ExistingDistributionGroup) {       
+    If ($ExistingDistributionGroup) {
         return $ExistingDistributionGroup | Select-Object Name, DisplayName, PrimarySmtpAddress
     }
     Else {

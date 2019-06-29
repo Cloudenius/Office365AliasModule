@@ -160,7 +160,7 @@ Function Get-UsedMailAlias {
         [ValidateNotNullOrEmpty()]
         [string]$GroupNamePrefix,
 
-        [parameter(Mandatory = $true, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
+        [parameter(Mandatory = $false, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
         [switch]$ExportAliasesToMailDraft
     )
 

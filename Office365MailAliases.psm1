@@ -90,7 +90,7 @@ Function Select-MailAlias {
         [ValidateNotNullOrEmpty()]
         [string]$DomainName,
 
-        [parameter(Mandatory = $true, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
+        [parameter(Mandatory = $false, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
         [switch]$ExportAliasesToMailDraft
     )
 
@@ -106,6 +106,8 @@ Function Select-MailAlias {
 
     If ($ExistingDistributionGroup) {
         Write-Verbose "Distribution Group already exists. Returning the name of the Distribution Group already in use"
+
+        $DistributionGroup = $ExistingDistributionGroup
 
         $EmailDomain = $DistributionGroup.PrimarySmtpAddress.Split('@')[1]
         $DisplayName = $DomainName + " - " + $EmailDomain

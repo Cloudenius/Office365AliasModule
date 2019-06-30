@@ -147,7 +147,15 @@ Function Select-MailAlias {
 
     # Create the draft mail in the mailbox of the user that contains all the used mail aliases
     If ($ExportAliasesToMailDraft) {
-        New-MailMessage -Body (Get-UsedMailAlias | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+        $MailMessage = New-MailMessage -Body (Get-UsedMailAlias | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+
+        if ($MailMessage) {
+            Write-Output "Successfully created draft mail message with subject '$($MailMessage.Subject)' and object state '$($MailMessage.ObjectState)'"
+        }
+
+        Else {
+            Write-Warning "Something went wrong with creating the draft mail message"
+        }
     }
 
     # Return the new name of the alias
@@ -175,7 +183,15 @@ Function Get-UsedMailAlias {
 
     # Create the draft mail in the mailbox of the user that contains all the used mail aliases
     If ($ExistingDistributionGroup -and $ExportAliasesToMailDraft) {
-        New-MailMessage -Body ($ExistingDistributionGroup | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+        $MailMessage = New-MailMessage -Body ($ExistingDistributionGroup | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+
+        if ($MailMessage) {
+            Write-Output "Successfully created draft mail message with subject '$($MailMessage.Subject)' and object state '$($MailMessage.ObjectState)'"
+        }
+
+        Else {
+            Write-Warning "Something went wrong with creating the draft mail message"
+        }
     }
 
     # Return the new name of the alias(es)

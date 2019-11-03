@@ -4,7 +4,8 @@
 
 .DESCRIPTION
   These mail aliases are created per domain name or organization. This is to make sure
-  that organizations get unique email addresses.
+  that organizations get unique email addresses. You need at least "User administrator"
+  permissions and the appropriate Exchange permissions to run the "New-MailAlias" command.
 
 .INPUTS
   None

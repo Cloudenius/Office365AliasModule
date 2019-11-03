@@ -29,19 +29,19 @@
 
 Function New-MailAlias {
     param(
-        [parameter(Mandatory = $false, HelpMessage = "Specify the amount of aliases required")]
+        [parameter(Mandatory = $true, HelpMessage = "Specify the amount of aliases required")]
         [ValidateNotNullOrEmpty()]
         [int]$NumberOfAliases,
 
-        [parameter(Mandatory = $false, HelpMessage = "Specify the amount of aliases required")]
+        [parameter(Mandatory = $true, HelpMessage = "Specify the domain name that is used for the email address. E.g. johndoe.com")]
         [ValidateNotNullOrEmpty()]
         [string]$EmailDomain,
 
-        [parameter(Mandatory = $false, HelpMessage = "Specify the amount of aliases required")]
+        [parameter(Mandatory = $true, HelpMessage = "Specify the owner of the alias. E.g. john@johndoe.com")]
         [ValidateNotNullOrEmpty()]
         [string]$Owner,
 
-        [parameter(Mandatory = $false, HelpMessage = "Specify the amount of aliases required")]
+        [parameter(Mandatory = $true, HelpMessage = "Specify the prefix that will be used to create the alias. E.g. JD")]
         [ValidateNotNullOrEmpty()]
         [string]$GroupNamePrefix
     )

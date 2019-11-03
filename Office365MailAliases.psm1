@@ -118,7 +118,7 @@ Function Select-MailAlias {
         $ClaimableDistributionGroups = Get-DistributionGroup | Where-Object {$_.DisplayName -Like "*_CLAIMABLE"} | Sort-Object WhenCreatedUtc
 
         If (!($ClaimableDistributionGroups)) {
-            Write-Error "No claimable Mail Aliases found. Please run New-Alias first."
+            Write-Error "No claimable Mail Aliases found. Please run New-MailAlias first."
             Break
         }
 

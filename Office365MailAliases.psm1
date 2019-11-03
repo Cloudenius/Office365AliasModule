@@ -60,27 +60,32 @@ Function New-MailAlias {
 
         Write-Verbose "Creating alias $i with name $GroupName"
 
-        # Create the new Distribution Group
-        Try {
-            New-DistributionGroup -Name $GroupName -Type "Security" `
-                -ManagedBy $Owner -PrimarySmtpAddress $GroupEmail
+        If (Get-DistributionGroup | Where-Object {$_.Name -like "*$GroupName*"}) {
+            Write-Verbose "Distribution Group name is not unique. Will skip name $GroupName"
         }
 
-        Catch [Exception] {
-            Write-Error "Distribution Group already exists or another error occurred"
-            Break
+        Else {
+            # Create the new Distribution Group
+            Try {
+                New-DistributionGroup -Name $GroupName -Type "Security" -ManagedBy $Owner -PrimarySmtpAddress $GroupEmail
+            }
+
+            Catch [Exception] {
+                Write-Error "Distribution Group already exists or another error occurred"
+                Break
+            }
+
+            # Allow external senders to mail to the address & set _CLAIMABLE suffix
+            Set-DistributionGroup -Identity $GroupName -RequireSenderAuthenticationEnabled:$false -DisplayName $($GroupName + "_CLAIMABLE")
+
+            # Modify the new Distribution Group with SendOnBehalf permissions
+            Add-RecipientPermission -Identity $GroupName -AccessRights SendAs -Trustee $Owner -Confirm:$false
+
+            # Add the owner to the Distribution Group
+            Add-DistributionGroupMember -Identity $GroupName -Member $Owner
+
+            Write-Verbose "Created group called $GroupName with owner $Owner"
         }
-
-        # Allow external senders to mail to the address & set _CLAIMABLE suffix
-        Set-DistributionGroup -Identity $GroupName -RequireSenderAuthenticationEnabled:$false -DisplayName $($GroupName + "_CLAIMABLE")
-
-        # Modify the new Distribution Group with SendOnBehalf permissions
-        Add-RecipientPermission -Identity $GroupName -AccessRights SendAs -Trustee $Owner -Confirm:$false
-
-        # Add the owner to the Distribution Group
-        Add-DistributionGroupMember -Identity $GroupName -Member $Owner
-
-        Write-Verbose "Created group called $GroupName with owner $Owner"
     }
 }
 
@@ -102,9 +107,7 @@ Function Select-MailAlias {
     Write-Verbose "Claiming an alias for $DomainName"
 
     # Check if domain name already exists in Distribution Group
-    $ExistingDistributionGroup = Get-DistributionGroup | Where-Object {$_.DisplayName -like "*$DomainName*"}
-
-    If ($ExistingDistributionGroup) {
+    If (Get-DistributionGroup | Where-Object {$_.DisplayName -like "*$DomainName*"}) {
         Write-Verbose "Distribution Group already exists. Returning the name of the Distribution Group already in use"
 
         $DistributionGroup = $ExistingDistributionGroup

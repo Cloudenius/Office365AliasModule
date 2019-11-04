@@ -108,8 +108,10 @@ Function Select-MailAlias {
     Write-Verbose "Claiming an alias for $DomainName"
 
     # Check if domain name already exists in Distribution Group
-    If (Get-DistributionGroup | Where-Object {$_.DisplayName -like "*$DomainName*"}) {
-        Write-Verbose "Distribution Group already exists. Returning the name of the Distribution Group already in use"
+    $ExistingDistributionGroup = Get-DistributionGroup | Where-Object {$_.DisplayName -like "*$DomainName*"}
+
+    If ($ExistingDistributionGroup) 
+        Write-Verbose "Alias for domain name '$($DomainName)' already exists. Returning the alias already in use"
 
         $DistributionGroup = $ExistingDistributionGroup
 

@@ -110,7 +110,7 @@ Function Select-MailAlias {
     # Check if domain name already exists in Distribution Group
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object {$_.DisplayName -like "*$DomainName*"}
 
-    If ($ExistingDistributionGroup) 
+    If ($ExistingDistributionGroup) {
         Write-Verbose "Alias for domain name '$($DomainName)' already exists. Returning the alias already in use"
 
         $DistributionGroup = $ExistingDistributionGroup

@@ -153,7 +153,7 @@ Function Select-MailAlias {
 
     # Create the draft mail in the mailbox of the user that contains all the used mail aliases
     If ($ExportAliasesToMailDraft) {
-        $MailMessage = New-MailMessage -Body (Get-UsedMailAlias | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+        $MailMessage = New-MailMessage -Body (Get-UsedMailAlias | Select-Object Name, DisplayName | Sort-Object DisplayName | Out-String) -Subject "Used Mailbox Aliases"
 
         if ($MailMessage) {
             Write-Output "Successfully created draft mail message with subject '$($MailMessage.Subject)' and object state '$($MailMessage.ObjectState)'"
@@ -189,7 +189,7 @@ Function Get-UsedMailAlias {
 
     # Create the draft mail in the mailbox of the user that contains all the used mail aliases
     If ($ExistingDistributionGroup -and $ExportAliasesToMailDraft) {
-        $MailMessage = New-MailMessage -Body ($ExistingDistributionGroup | Select-Object Name, DisplayName | Out-String) -Subject "Used Mailbox Aliases"
+        $MailMessage = New-MailMessage -Body ($ExistingDistributionGroup | Select-Object Name, DisplayName | Sort-Object DisplayName | Out-String) -Subject "Used Mailbox Aliases"
 
         if ($MailMessage) {
             Write-Output "Successfully created draft mail message with subject '$($MailMessage.Subject)' and object state '$($MailMessage.ObjectState)'"
@@ -202,7 +202,7 @@ Function Get-UsedMailAlias {
 
     # Return the new name of the alias(es)
     If ($ExistingDistributionGroup) {
-        return $ExistingDistributionGroup | Select-Object Name, DisplayName, PrimarySmtpAddress
+        return $ExistingDistributionGroup | Select-Object Name, DisplayName, PrimarySmtpAddress | Sort-Object DisplayName
     }
     Else {
         return

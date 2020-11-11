@@ -108,10 +108,10 @@ Function Select-MailAlias {
     Write-Verbose "Claiming an alias for $DomainName"
 
     # Check if domain name already exists in Distribution Group
-    $ExistingDistributionGroup = Get-DistributionGroup | Where-Object {$_.DisplayName -like "*$DomainName*"}
+    $ExistingDistributionGroup = Get-DistributionGroup | Where-Object {$_.DisplayName -like "$DomainName - *"}
 
     If ($ExistingDistributionGroup) {
-        Write-Verbose "Alias for domain name '$($DomainName)' already exists. Returning the alias already in use"
+        Write-Output "Alias for domain name '$($DomainName)' already exists. Returning the alias already in use"
 
         $DistributionGroup = $ExistingDistributionGroup
 
@@ -232,4 +232,36 @@ Function Get-UnusedMailAlias {
     Else {
         return
     }
+}
+
+Function Set-MailAliasToArchived {
+    param(
+        [parameter(Mandatory = $true, HelpMessage = "Specify the domain name of the website")]
+        [ValidateNotNullOrEmpty()]
+        [string]$DomainName
+    )
+
+    ## Login to Office 365
+    If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
+        Connect-EXOPSSession
+    }
+
+    # Check if domain name already exists in Distribution Group
+    $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
+        {$_.DisplayName -like "$DomainName - *"}
+
+    # Add "(Archived)" prefix to display name
+    If ($ExistingDistributionGroup.DisplayName -like "(Archived)*") {
+        Write-Output "Domain name is already archived, see:"
+    }
+
+    else {
+        Write-Output "Changing displayName from '$($ExistingDistributionGroup.DisplayName)' to '(Archived) $($ExistingDistributionGroup.DisplayName)'"
+        Set-DistributionGroup -Identity $ExistingDistributionGroup.Identity -DisplayName "(Archived) $($ExistingDistributionGroup.DisplayName)"
+    
+        # Return the new name of the alias
+        Write-Output "Done, new result:"
+    }
+
+    return Get-DistributionGroup -Identity $ExistingDistributionGroup.Identity | Select-Object Name, DisplayName, PrimarySmtpAddress
 }

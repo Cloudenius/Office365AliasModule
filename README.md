@@ -13,7 +13,7 @@ Install-Module -Name Office365MailAliases
 ```
 
 # Feature requests
-Open the Work Items [on the Board](https://dev.azure.com/Cloudenius/Office%20365%20Alias%20Module/_workitems/recentlyupdated/).
+Please create a GitHub issue.
 
 # Build and Test
 The code is checked by running the PSScriptAnalyzer extension during the build. Unit tests might follow.

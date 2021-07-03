@@ -250,14 +250,16 @@ Function Set-MailAliasToArchived {
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
         {$_.DisplayName -like "$DomainName - *"}
 
-    # Add "(Archived)" prefix to display name
-    If ($ExistingDistributionGroup.DisplayName -like "(Archived)*") {
-        Write-Output "Domain name is already archived, see:"
+    if (!$ExistingDistributionGroup) {
+        throw "Cannot find an existing Distribution Group with domain name '$($DomainName)'"
     }
 
     else {
         Write-Output "Changing displayName from '$($ExistingDistributionGroup.DisplayName)' to '(Archived) $($ExistingDistributionGroup.DisplayName)'"
         Set-DistributionGroup -Identity $ExistingDistributionGroup.Identity -DisplayName "(Archived) $($ExistingDistributionGroup.DisplayName)"
+
+        Write-Output "Removing members from distribution group"
+        $ExistingDistributionGroup | Remove-DistributionGroupMember -Confirm:$false
     
         # Return the new name of the alias
         Write-Output "Done, new result:"

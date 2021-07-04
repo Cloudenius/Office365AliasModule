@@ -20,5 +20,5 @@ jobs:
 
       - name: Publish to the PS Gallery
         run: |
-          Publish-Module -Name 'Office365MailAliases' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
+          Publish-Module -Path '.\Office365MailAliases\' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
         shell: pwsh

@@ -1,0 +1,22 @@
+
+{
+    "editor.formatOnType": true,
+    "editor.detectIndentation": true,
+    "editor.insertSpaces": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "files.trimTrailingWhitespace": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 2000,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true
+    },
+    "powershell.codeFormatting.addWhitespaceAroundPipe": true,
+    "powershell.codeformatting.enable": true,
+    "powershell.codeFormatting.openBraceOnSameLine": true,
+    "terminal.integrated.shell.linux": "/bin/bash"
+}

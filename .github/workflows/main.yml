@@ -19,5 +19,5 @@ jobs:
 
       - name: Publish to the PS Gallery
         run: |
-          Publish-Module -Name 'Office365MailAliases' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }} -Exclude .github/*
+          Publish-Module -Name 'Office365MailAliases' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }} -Exclude '.github/*', '.vscode/*'
         shell: pwsh

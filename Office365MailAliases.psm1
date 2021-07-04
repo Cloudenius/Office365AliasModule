@@ -53,7 +53,7 @@ Function New-MailAlias {
     )
 
     ## Login to Office 365
-    If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
+    If (!(Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" })) {
         Connect-ExchangeOnline -ShowBanner:$false
     }
 
@@ -66,7 +66,7 @@ Function New-MailAlias {
 
         Write-Verbose "Creating alias $i with name $GroupName"
 
-        If (Get-DistributionGroup | Where-Object {$_.Name -like "*$GroupName*"}) {
+        If (Get-DistributionGroup | Where-Object { $_.Name -like "*$GroupName*" }) {
             Write-Verbose "Distribution Group name is not unique. Will skip name $GroupName"
         }
 
@@ -96,7 +96,7 @@ Function New-MailAlias {
 
     # Disconnect the session to make sure we don't run out of maximum concurrent connections
     If (!$KeepAlive) {
-        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+        If (Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" }) {
             $Null = Disconnect-ExchangeOnline -Confirm:$false
         }
     }
@@ -118,14 +118,14 @@ Function Select-MailAlias {
     )
 
     ## Login to Office 365
-    If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
+    If (!(Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" })) {
         Connect-ExchangeOnline -ShowBanner:$false
     }
 
     Write-Verbose "Claiming an alias for $DomainName"
 
     # Check if domain name already exists in Distribution Group
-    $ExistingDistributionGroup = Get-DistributionGroup | Where-Object {$_.DisplayName -like "$DomainName - *"}
+    $ExistingDistributionGroup = Get-DistributionGroup | Where-Object { $_.DisplayName -like "$DomainName - *" }
 
     If ($ExistingDistributionGroup) {
         Write-Output "Alias for domain name '$($DomainName)' already exists. Returning the alias already in use"
@@ -138,14 +138,14 @@ Function Select-MailAlias {
 
     Else {
         # Search for unused alias and return the oldest one
-        $ClaimableDistributionGroups = Get-DistributionGroup | Where-Object {$_.DisplayName -Like "*_CLAIMABLE"} | Sort-Object WhenCreatedUtc
+        $ClaimableDistributionGroups = Get-DistributionGroup | Where-Object { $_.DisplayName -Like "*_CLAIMABLE" } | Sort-Object WhenCreatedUtc
 
         If (!($ClaimableDistributionGroups)) {
             Write-Error "No claimable Mail Aliases found. Please run New-MailAlias first."
             Break
         }
 
-        While (!($ClaimableDistributionGroups = Get-DistributionGroup | Where-Object {$_.DisplayName -Like "*_CLAIMABLE"})) {
+        While (!($ClaimableDistributionGroups = Get-DistributionGroup | Where-Object { $_.DisplayName -Like "*_CLAIMABLE" })) {
             Write-Output "Waiting for a new claimable Distribution Group. Pause 5 seconds..."
             Start-Sleep -Seconds 5
         }
@@ -183,13 +183,13 @@ Function Select-MailAlias {
 
     # Disconnect the session to make sure we don't run out of maximum concurrent connections
     If (!$KeepAlive) {
-        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+        If (Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" }) {
             $Null = Disconnect-ExchangeOnline -Confirm:$false
         }
     }
 
     # Return the new name of the alias
-    return New-Object PSObject -Property ([ordered]@{"Name" = $DistributionGroup.Name; "DisplayName" = $DisplayName; "E-mail" = $DistributionGroup.PrimarySmtpAddress})
+    return New-Object PSObject -Property ([ordered]@{"Name" = $DistributionGroup.Name; "DisplayName" = $DisplayName; "E-mail" = $DistributionGroup.PrimarySmtpAddress })
 }
 
 Function Get-UsedMailAlias {
@@ -208,13 +208,13 @@ Function Get-UsedMailAlias {
     )
 
     ## Login to Office 365
-    If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
+    If (!(Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" })) {
         Connect-ExchangeOnline -ShowBanner:$false
     }
 
     # Check if domain name already exists in Distribution Group
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
-        {$_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -notlike "*_CLAIMABLE"}
+    { $_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -notlike "*_CLAIMABLE" }
 
     # Create the draft mail in the mailbox of the user that contains all the used mail aliases
     If ($ExistingDistributionGroup -and $ExportAliasesToMailDraft) {
@@ -231,7 +231,7 @@ Function Get-UsedMailAlias {
 
     # Disconnect the session to make sure we don't run out of maximum concurrent connections
     If (!$KeepAlive) {
-        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+        If (Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" }) {
             $Null = Disconnect-ExchangeOnline -Confirm:$false
         }
     }
@@ -258,17 +258,17 @@ Function Get-UnusedMailAlias {
     )
 
     ## Login to Office 365
-    If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
+    If (!(Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" })) {
         Connect-ExchangeOnline -ShowBanner:$false
     }
 
     # Check if domain name already exists in Distribution Group
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
-        {$_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -like "*_CLAIMABLE"}
+    { $_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -like "*_CLAIMABLE" }
 
     # Disconnect the session to make sure we don't run out of maximum concurrent connections
     If (!$KeepAlive) {
-        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+        If (Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" }) {
             $Null = Disconnect-ExchangeOnline -Confirm:$false
         }
     }
@@ -295,13 +295,13 @@ Function Set-MailAliasToArchived {
     )
 
     ## Login to Office 365
-    If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
+    If (!(Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" })) {
         Connect-ExchangeOnline -ShowBanner:$false
     }
 
     # Check if domain name already exists in Distribution Group
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
-        {$_.DisplayName -like "$DomainName - *"}
+    { $_.DisplayName -like "$DomainName - *" }
 
     if (!$ExistingDistributionGroup) {
         throw "Cannot find an existing Distribution Group with domain name '$($DomainName)'"
@@ -313,7 +313,7 @@ Function Set-MailAliasToArchived {
 
         Write-Output "Removing members from distribution group"
         $ExistingDistributionGroup | Remove-DistributionGroupMember -Confirm:$false
-    
+
         # Return the new name of the alias
         Write-Output "Done, new result:"
     }
@@ -322,7 +322,7 @@ Function Set-MailAliasToArchived {
 
     # Disconnect the session to make sure we don't run out of maximum concurrent connections
     If (!$KeepAlive) {
-        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+        If (Get-PSSession | Where-Object { $_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened" }) {
             $Null = Disconnect-ExchangeOnline -Confirm:$false
         }
     }

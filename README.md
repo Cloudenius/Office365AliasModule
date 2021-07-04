@@ -4,8 +4,9 @@ This PowerShell Module creates mail aliases in Office 365. These mail aliases ar
 
 This module is tested in Azure PowerShell. The author recommends to run the code from Azure PowerShell to simplify authentication to Office 365.
 
-[![CI](https://github.com/Cloudenius/Office365AliasModule/workflows/CI/badge.svg)](https://github.com/Cloudenius/Office365AliasModule/actions?query=workflow%3ACI)
-[![Release Status](https://cloudenius.vsrm.visualstudio.com/_apis/public/Release/badge/e1f84d2c-10aa-42f5-b85a-8925cff41305/1/1)](https://cloudenius.visualstudio.com/Office%20365%20Alias%20Module/_build/latest?definitionId=7&branchName=master)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/Office365MailAliases.svg?style=flat-square&label=PowerShell%20Gallery)](https://www.powershellgallery.com/packages/Office365MailAliases/)
+[![Release](https://github.com/DevSecNinja/Office365AliasModule/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/DevSecNinja/Office365AliasModule/actions/workflows/main.yml)
+[![Lint Code Base](https://github.com/DevSecNinja/Office365AliasModule/actions/workflows/linter.yml/badge.svg?branch=master)](https://github.com/DevSecNinja/Office365AliasModule/actions/workflows/linter.yml)
 
 ## Download
 

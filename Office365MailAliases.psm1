@@ -30,7 +30,7 @@
 
 Function New-MailAlias {
     #Requires -Modules ExchangeOnlineManagement
-
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '*', Scope = 'Function', Target = '*', Justification = 'Does not change system state')]
     param(
         [parameter(Mandatory = $true, HelpMessage = "Specify the amount of aliases required")]
         [ValidateNotNullOrEmpty()]
@@ -198,6 +198,7 @@ Function Get-UsedMailAlias {
     param(
         [parameter(Mandatory = $false, HelpMessage = "Name prefix that is used to identify the Mail Aliases")]
         [ValidateNotNullOrEmpty()]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '$GroupNamePrefix', Justification = 'False positive')]
         [string]$GroupNamePrefix,
 
         [parameter(Mandatory = $false, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
@@ -251,6 +252,7 @@ Function Get-UnusedMailAlias {
     param(
         [parameter(Mandatory = $false, HelpMessage = "Name prefix that is used to identify the Mail Aliases")]
         [ValidateNotNullOrEmpty()]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '$GroupNamePrefix', Justification = 'False positive')]
         [string]$GroupNamePrefix,
 
         [parameter(Mandatory = $false, HelpMessage = "Keep the Exchange Online session alive for further use")]
@@ -284,6 +286,7 @@ Function Get-UnusedMailAlias {
 
 Function Set-MailAliasToArchived {
     #Requires -Modules ExchangeOnlineManagement
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '*', Scope = 'Function', Target = '*', Justification = 'Does not change system state')]
 
     param(
         [parameter(Mandatory = $true, HelpMessage = "Specify the domain name of the website")]

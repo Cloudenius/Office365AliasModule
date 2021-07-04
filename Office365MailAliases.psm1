@@ -29,6 +29,8 @@
 #>
 
 Function New-MailAlias {
+    #Requires -Modules ExchangeOnlineManagement
+
     param(
         [parameter(Mandatory = $true, HelpMessage = "Specify the amount of aliases required")]
         [ValidateNotNullOrEmpty()]
@@ -44,12 +46,15 @@ Function New-MailAlias {
 
         [parameter(Mandatory = $true, HelpMessage = "Specify the prefix that will be used to create the alias. E.g. JD")]
         [ValidateNotNullOrEmpty()]
-        [string]$GroupNamePrefix
+        [string]$GroupNamePrefix,
+
+        [parameter(Mandatory = $false, HelpMessage = "Keep the Exchange Online session alive for further use")]
+        [switch]$KeepAlive
     )
 
     ## Login to Office 365
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
-        Connect-EXOPSSession
+        Connect-ExchangeOnline -ShowBanner:$false
     }
 
     Write-Verbose "Creating $NumberOfAliases aliases"
@@ -88,21 +93,33 @@ Function New-MailAlias {
             Write-Verbose "Created group called $GroupName with owner $Owner"
         }
     }
+
+    # Disconnect the session to make sure we don't run out of maximum concurrent connections
+    If (!$KeepAlive) {
+        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+            $Null = Disconnect-ExchangeOnline -Confirm:$false
+        }
+    }
 }
 
 Function Select-MailAlias {
+    #Requires -Modules ExchangeOnlineManagement
+
     param(
         [parameter(Mandatory = $true, HelpMessage = "Specify the domain name of the website")]
         [ValidateNotNullOrEmpty()]
         [string]$DomainName,
 
         [parameter(Mandatory = $false, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
-        [switch]$ExportAliasesToMailDraft
+        [switch]$ExportAliasesToMailDraft,
+
+        [parameter(Mandatory = $false, HelpMessage = "Keep the Exchange Online session alive for further use")]
+        [switch]$KeepAlive
     )
 
     ## Login to Office 365
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
-        Connect-EXOPSSession
+        Connect-ExchangeOnline -ShowBanner:$false
     }
 
     Write-Verbose "Claiming an alias for $DomainName"
@@ -164,23 +181,35 @@ Function Select-MailAlias {
         }
     }
 
+    # Disconnect the session to make sure we don't run out of maximum concurrent connections
+    If (!$KeepAlive) {
+        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+            $Null = Disconnect-ExchangeOnline -Confirm:$false
+        }
+    }
+
     # Return the new name of the alias
     return New-Object PSObject -Property ([ordered]@{"Name" = $DistributionGroup.Name; "DisplayName" = $DisplayName; "E-mail" = $DistributionGroup.PrimarySmtpAddress})
 }
 
 Function Get-UsedMailAlias {
+    #Requires -Modules ExchangeOnlineManagement
+
     param(
         [parameter(Mandatory = $false, HelpMessage = "Name prefix that is used to identify the Mail Aliases")]
         [ValidateNotNullOrEmpty()]
         [string]$GroupNamePrefix,
 
         [parameter(Mandatory = $false, HelpMessage = "Create a draft mail in the mailbox of the user that contains all the used mail aliases")]
-        [switch]$ExportAliasesToMailDraft
+        [switch]$ExportAliasesToMailDraft,
+
+        [parameter(Mandatory = $false, HelpMessage = "Keep the Exchange Online session alive for further use")]
+        [switch]$KeepAlive
     )
 
     ## Login to Office 365
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
-        Connect-EXOPSSession
+        Connect-ExchangeOnline -ShowBanner:$false
     }
 
     # Check if domain name already exists in Distribution Group
@@ -200,6 +229,13 @@ Function Get-UsedMailAlias {
         }
     }
 
+    # Disconnect the session to make sure we don't run out of maximum concurrent connections
+    If (!$KeepAlive) {
+        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+            $Null = Disconnect-ExchangeOnline -Confirm:$false
+        }
+    }
+
     # Return the new name of the alias(es)
     If ($ExistingDistributionGroup) {
         return $ExistingDistributionGroup | Select-Object Name, DisplayName, PrimarySmtpAddress | Sort-Object DisplayName
@@ -210,20 +246,32 @@ Function Get-UsedMailAlias {
 }
 
 Function Get-UnusedMailAlias {
+    #Requires -Modules ExchangeOnlineManagement
+
     param(
         [parameter(Mandatory = $false, HelpMessage = "Name prefix that is used to identify the Mail Aliases")]
         [ValidateNotNullOrEmpty()]
-        [string]$GroupNamePrefix
+        [string]$GroupNamePrefix,
+
+        [parameter(Mandatory = $false, HelpMessage = "Keep the Exchange Online session alive for further use")]
+        [switch]$KeepAlive
     )
 
     ## Login to Office 365
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
-        Connect-EXOPSSession
+        Connect-ExchangeOnline -ShowBanner:$false
     }
 
     # Check if domain name already exists in Distribution Group
     $ExistingDistributionGroup = Get-DistributionGroup | Where-Object `
         {$_.Name -like "$GroupNamePrefix*" -and $_.DisplayName -like "*_CLAIMABLE"}
+
+    # Disconnect the session to make sure we don't run out of maximum concurrent connections
+    If (!$KeepAlive) {
+        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+            $Null = Disconnect-ExchangeOnline -Confirm:$false
+        }
+    }
 
     # Return the names of the unused alias(es)
     If ($ExistingDistributionGroup) {
@@ -235,15 +283,20 @@ Function Get-UnusedMailAlias {
 }
 
 Function Set-MailAliasToArchived {
+    #Requires -Modules ExchangeOnlineManagement
+
     param(
         [parameter(Mandatory = $true, HelpMessage = "Specify the domain name of the website")]
         [ValidateNotNullOrEmpty()]
-        [string]$DomainName
+        [string]$DomainName,
+
+        [parameter(Mandatory = $false, HelpMessage = "Keep the Exchange Online session alive for further use")]
+        [switch]$KeepAlive
     )
 
     ## Login to Office 365
     If (!(Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"})) {
-        Connect-EXOPSSession
+        Connect-ExchangeOnline -ShowBanner:$false
     }
 
     # Check if domain name already exists in Distribution Group
@@ -265,5 +318,14 @@ Function Set-MailAliasToArchived {
         Write-Output "Done, new result:"
     }
 
-    return Get-DistributionGroup -Identity $ExistingDistributionGroup.Identity | Select-Object Name, DisplayName, PrimarySmtpAddress
+    $output = Get-DistributionGroup -Identity $ExistingDistributionGroup.Identity | Select-Object Name, DisplayName, PrimarySmtpAddress
+
+    # Disconnect the session to make sure we don't run out of maximum concurrent connections
+    If (!$KeepAlive) {
+        If (Get-PSSession | Where-Object {$_.ComputerName -eq "outlook.office365.com" -and $_.State -eq "Opened"}) {
+            $Null = Disconnect-ExchangeOnline -Confirm:$false
+        }
+    }
+
+    return $output
 }

@@ -15,9 +15,9 @@ jobs:
         run: |
           Write-Output "Run ID is $ENV:GITHUB_RUN_ID"
           (Get-Content Office365MailAliases.psd1 -Raw) -replace "<ReplaceWithBuildId>", $ENV:GITHUB_RUN_ID | Set-Content Office365MailAliases.psd1
-        shell: pwsh 
+        shell: pwsh
 
       - name: Publish to the PS Gallery
         run: |
-          Publish-Module -Name 'Office365MailAliases' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }} -Exclude '.github/*', '.vscode/*'
+          Publish-Module -Name 'Office365MailAliases' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
         shell: pwsh
